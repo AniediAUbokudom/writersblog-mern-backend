@@ -1,9 +1,10 @@
-require('dotenv').config()
+require("dotenv").config();
 const express = require("express");
-const cors = require('cors');
+const app = express();
+const cors = require("cors");
 const mongoose = require("mongoose");
 const { v4 } = require("uuid");
-const app = express();
+
 const port = process.env.PORT;
 
 app.use(cors());
@@ -21,20 +22,20 @@ app.use((req, res, next) => {
 // CORS (Cross Origin Resource Sharing) - Cross Origin Policy
 
 mongoose.set("strictQuery", true);
-const mongoDB=process.env.MONGODB_URI
+const mongoDB = process.env.MONGODB_URI;
 
-
-mongoose.connect(mongoDB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose
+  .connect(mongoDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
   })
   .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
+    console.error("Error connecting to MongoDB:", err);
   });
-  
+
 const journalSchema = new mongoose.Schema({
   uid: String,
   title: String,
@@ -43,40 +44,39 @@ const journalSchema = new mongoose.Schema({
 });
 const journalTable = mongoose.model("Journals", journalSchema);
 
-app.post('/create-journal',async (req,res)=>{
-  const body=req.body
+app.post("/create-journal", async (req, res) => {
+  const body = req.body;
   await journalTable.create({
-    uid:v4(),
-    content:body.content,
-    title:body.title,
-    date:body.date
+    uid: v4(),
+    content: body.content,
+    title: body.title,
+    date: body.date,
   });
   res.send("Journal created successfully");
 });
 
-app.get('/read-all-journal',async (req,res)=>{
-  const data=await journalTable.find()
-  res.send(data)
-});//created route to get all journals
+app.get("/read-all-journal", async (req, res) => {
+  const data = await journalTable.find();
+  res.send(data);
+}); //created route to get all journals
 
-
-app.post('/update-journal',async (req,res)=>{
-  const {uid}=req.query
-  const body=req.body
-  await journalTable.updateOne({'uid':uid},body);
+app.post("/update-journal", async (req, res) => {
+  const { uid } = req.query;
+  const body = req.body;
+  await journalTable.updateOne({ uid: uid }, body);
   res.send("Journal updated successfully");
 });
 
-app.delete('/delete-journal',async (req,res)=>{
-  const {uid}=req.query
-  await journalTable.deleteOne({'uid':uid});
+app.delete("/delete-journal", async (req, res) => {
+  const { uid } = req.query;
+  await journalTable.deleteOne({ uid: uid });
   res.send("Journal deleted successfully");
 });
 
-app.get('/read-journal-byId',async(req,res)=>{
-  const {uid}=req.query// Extracts the query param from the link/endpoint
-  const data=await journalTable.findOne({'uid':uid})
-  res.send(data)
+app.get("/read-journal-byId", async (req, res) => {
+  const { uid } = req.query; // Extracts the query param from the link/endpoint
+  const data = await journalTable.findOne({ uid: uid });
+  res.send(data);
 });
 
 app.listen(port, () => {
