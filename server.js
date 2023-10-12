@@ -54,7 +54,7 @@ app.post("/create-journal", async (req, res) => {
   });
   res.send("Journal created successfully");
 });
-//need to fig why alerts aren't sent always
+
 app.get("/read-all-journal", async (req, res) => {
   const data = await journalTable.find();
   res.send(data);
